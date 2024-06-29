@@ -72,9 +72,9 @@ def urls_post():
             curs.execute('INSERT INTO urls (name, created_at) '
                          'VALUES (%s, %s)', (new_url, date.today()))
             conn.commit()
+            flash('URL was added successfully', 'success')
         curs.execute('SELECT id FROM urls WHERE name = %s', (new_url,))
         id = curs.fetchone().id
-        flash('URL was added successfully', 'success')
         return redirect(url_for('url_get', id=id), 302)
 
 
