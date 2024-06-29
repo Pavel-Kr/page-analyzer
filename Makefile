@@ -3,6 +3,9 @@ PORT?=8000
 install:
 	poetry install
 
+build:
+	./build.sh
+
 dev:
 	poetry run flask --app page_analyzer:app --debug run
 
