@@ -102,7 +102,7 @@ def url_get(id):
             checks=url_checks,
             messages=messages
         )
-    
+
 
 @app.post('/urls/<id>/checks')
 def checks_post(id):
