@@ -37,6 +37,7 @@ def validate_url(data):
 
 @app.get('/urls')
 def urls_get():
+    messages = get_flashed_messages(with_categories=True)
     conn = psycopg2.connect(DATABASE_URL)
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute("""SELECT
@@ -50,7 +51,8 @@ def urls_get():
         urls = curs.fetchall()
         return render_template(
             'urls.html',
-            urls=urls
+            urls=urls,
+            messages=messages
         )
 
 
@@ -108,6 +110,11 @@ def url_get(id):
 def checks_post(id):
     conn = psycopg2.connect(DATABASE_URL)
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
+        curs.execute('SELECT * FROM urls WHERE id = %s', (id,))
+        url = curs.fetchone()
+        if not url:
+            flash('Incorrect URL ID', 'danger')
+            return redirect(url_for('urls_get'))
         curs.execute('INSERT INTO url_checks (url_id, created_at)'
                      'VALUES (%s, %s)', (id, date.today()))
         conn.commit()
