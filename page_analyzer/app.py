@@ -39,7 +39,14 @@ def validate_url(data):
 def urls_get():
     conn = psycopg2.connect(DATABASE_URL)
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-        curs.execute('SELECT * FROM urls')
+        curs.execute("""SELECT
+                        urls.id AS id,
+                        urls.name AS name,
+                        MAX(url_checks.created_at) AS created_at,
+                        url_checks.status_code AS status_code
+                        FROM urls LEFT JOIN url_checks
+                        ON urls.id = url_checks.url_id
+                        GROUP BY urls.id, urls.name, url_checks.status_code""")
         urls = curs.fetchall()
         return render_template(
             'urls.html',
@@ -87,8 +94,22 @@ def url_get(id):
         url = curs.fetchone()
         if not url:
             return 'Page not found', 404
+        curs.execute('SELECT * FROM url_checks WHERE url_id = %s', (id,))
+        url_checks = curs.fetchall()
         return render_template(
             'show.html',
             url=url,
+            checks=url_checks,
             messages=messages
         )
+    
+
+@app.post('/urls/<id>/checks')
+def checks_post(id):
+    conn = psycopg2.connect(DATABASE_URL)
+    with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
+        curs.execute('INSERT INTO url_checks (url_id, created_at)'
+                     'VALUES (%s, %s)', (id, date.today()))
+        conn.commit()
+        flash('Page was successfully checked', 'success')
+        return redirect(url_for('url_get', id=id), 302)

@@ -18,4 +18,34 @@
         </tr>
     </table>
 </div>
+
+<div class="mt-5">
+    <h2>Checks</h2>
+    <form action="{{ url_for('checks_post', id=url.id) }}" method="post" class="py-2">
+        <input type="submit" value="Initiate check" class="btn btn-primary">
+    </form>
+</div>
+
+<div class="mt-2">
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Response code</th>
+            <th>h1</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Created at</th>
+        </tr>
+        {% for check in checks %}
+        <tr>
+            <td>{{ check.id }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ check.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}
