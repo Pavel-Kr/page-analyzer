@@ -49,17 +49,17 @@ def urls_get():
         curs.execute('SELECT id, name FROM urls')
         urls = curs.fetchall()
         entries = []
-        for url in urls:
+        for u in urls:
             curs.execute("""SELECT
                             status_code,
                             created_at
                             FROM url_checks
                             WHERE url_id = %s
                             ORDER BY created_at DESC
-                            LIMIT 1""", (url.id,))
+                            LIMIT 1""", (u.id,))
             check = curs.fetchone()
             entry = {
-                'url': url,
+                'url': u,
                 'last_check': check
             }
             entries.append(entry)
@@ -129,8 +129,10 @@ def checks_post(id):
         try:
             r = requests.get(url.name, timeout=1)
             r.raise_for_status()
-            curs.execute('INSERT INTO url_checks (url_id, status_code, created_at)'
-                         'VALUES (%s, %s, %s)', (id, r.status_code, date.today()))
+            curs.execute('INSERT INTO url_checks'
+                         '(url_id, status_code, created_at)'
+                         'VALUES (%s, %s, %s)',
+                         (id, r.status_code, date.today()))
             conn.commit()
             flash('Page was successfully checked', 'success')
         except (ConnectionError, HTTPError, Timeout):
