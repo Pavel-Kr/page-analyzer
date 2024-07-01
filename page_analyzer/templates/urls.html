@@ -10,12 +10,12 @@
             <th>Last check</th>
             <th>Response code</th>
         </tr>
-        {% for url in urls %}
+        {% for entry in entries %}
         <tr>
-            <td>{{ url.id }}</td>
-            <td><a href="{{ url_for('url_get', id=url.id) }}">{{ url.name }}</a></td>
-            <td>{{ url.created_at|default('', true) }}</td>
-            <td></td>
+            <td>{{ entry.url.id }}</td>
+            <td><a href="{{ url_for('url_get', id=entry.url.id) }}">{{ entry.url.name }}</a></td>
+            <td>{{ entry.last_check.created_at|default('', true) }}</td>
+            <td>{{ entry.last_check.status_code|default('', true) }}</td>
         </tr>
         {% endfor %}
     </table>

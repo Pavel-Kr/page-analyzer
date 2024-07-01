@@ -39,7 +39,7 @@
         {% for check in checks %}
         <tr>
             <td>{{ check.id }}</td>
-            <td></td>
+            <td>{{ check.status_code|default('', true) }}</td>
             <td></td>
             <td></td>
             <td></td>
