@@ -20,6 +20,7 @@ from requests.exceptions import (
     Timeout,
     ConnectionError
 )
+from bs4 import BeautifulSoup
 
 
 load_dotenv()
@@ -123,6 +124,20 @@ def url_get(id):
     )
 
 
+def extract_seo_info(soup):
+    h1 = None
+    title = None
+    description = None
+    if soup.h1:
+        h1 = soup.h1.string
+    if soup.title:
+        title = soup.title.string
+    meta = soup.find_all('meta', attrs={'name': 'description'})
+    if meta:
+        description = meta[0]['content']
+    return (h1, title, description)
+
+
 @app.post('/urls/<id>/checks')
 def checks_post(id):
     conn = psycopg2.connect(DATABASE_URL)
@@ -136,10 +151,12 @@ def checks_post(id):
         try:
             r = requests.get(url.name, timeout=1)
             r.raise_for_status()
+            soup = BeautifulSoup(r.content, 'html.parser')
+            h1, title, description = extract_seo_info(soup)
             curs.execute('INSERT INTO url_checks'
-                         '(url_id, status_code, created_at)'
-                         'VALUES (%s, %s, %s)',
-                         (id, r.status_code, date.today()))
+                         '(url_id, status_code, h1, title, description, created_at)'
+                         'VALUES (%s, %s, %s, %s, %s, %s)',
+                         (id, r.status_code, h1, title, description, date.today()))
             conn.commit()
             flash('Page was successfully checked', 'success')
         except (ConnectionError, HTTPError, Timeout):
