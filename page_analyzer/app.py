@@ -159,9 +159,11 @@ def checks_post(id):
             soup = BeautifulSoup(r.content, 'html.parser')
             h1, title, description = extract_seo_info(soup)
             curs.execute('INSERT INTO url_checks'
-                         '(url_id, status_code, h1, title, description, created_at)'
+                         '(url_id, status_code, h1, title,'
+                         'description, created_at)'
                          'VALUES (%s, %s, %s, %s, %s, %s)',
-                         (id, r.status_code, h1, title, description, date.today()))
+                         (id, r.status_code, h1, title,
+                          description, date.today()))
             conn.commit()
             flash('Page was successfully checked', 'success')
         except (ConnectionError, HTTPError, Timeout):
