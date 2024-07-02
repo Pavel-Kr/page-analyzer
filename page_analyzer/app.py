@@ -72,6 +72,13 @@ def urls_get():
     )
 
 
+def normalized(url):
+    parsed = urlparse(url)
+    normalized = (parsed.scheme, parsed.netloc, '', '', '', '')
+    new_url = urlunparse(normalized)
+    return new_url
+
+
 @app.post('/urls')
 def urls_post():
     data = request.form.to_dict()
@@ -86,9 +93,7 @@ def urls_post():
 
     conn = psycopg2.connect(DATABASE_URL)
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-        parsed = urlparse(data['url'])
-        normalized = (parsed.scheme, parsed.netloc, '', '', '', '')
-        new_url = urlunparse(normalized)
+        new_url = normalized(data['url'])
         curs.execute('SELECT * FROM urls WHERE name = %s', (new_url,))
         db_entry = curs.fetchone()
         print(db_entry)
