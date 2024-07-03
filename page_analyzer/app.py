@@ -83,7 +83,7 @@ def normalized(url):
 def urls_post():
     data = request.form.to_dict()
     if not validate_url(data):
-        flash('Incorrect URL', 'danger')
+        flash('Некорректный URL', 'danger')
         messages = get_flashed_messages(with_categories=True)
         return render_template(
             'index.html',
@@ -96,15 +96,16 @@ def urls_post():
         new_url = normalized(data['url'])
         curs.execute('SELECT * FROM urls WHERE name = %s', (new_url,))
         db_entry = curs.fetchone()
-        print(db_entry)
         if not db_entry:
-            print('Insert into database')
             curs.execute('INSERT INTO urls (name, created_at) '
                          'VALUES (%s, %s)', (new_url, date.today()))
             conn.commit()
-            flash('URL was added successfully', 'success')
-        curs.execute('SELECT id FROM urls WHERE name = %s', (new_url,))
-        id = curs.fetchone().id
+            flash('Страница успешно добавлена', 'success')
+            curs.execute('SELECT id FROM urls WHERE name = %s', (new_url,))
+            id = curs.fetchone().id
+        else:
+            flash('Страница уже существует', 'info')
+            id = db_entry.id
     conn.close()
     return redirect(url_for('url_get', id=id), 302)
 
@@ -150,7 +151,7 @@ def checks_post(id):
         curs.execute('SELECT * FROM urls WHERE id = %s', (id,))
         url = curs.fetchone()
         if not url:
-            flash('Incorrect URL ID', 'danger')
+            flash('Некорректный URL ID', 'danger')
             conn.close()
             return redirect(url_for('urls_get'))
         try:
@@ -165,8 +166,8 @@ def checks_post(id):
                          (id, r.status_code, h1, title,
                           description, date.today()))
             conn.commit()
-            flash('Page was successfully checked', 'success')
+            flash('Страница успешно проверена', 'success')
         except (ConnectionError, HTTPError, Timeout):
-            flash('An error occured during check', 'danger')
+            flash('Произошла ошибка при проверке', 'danger')
     conn.close()
     return redirect(url_for('url_get', id=id), 302)

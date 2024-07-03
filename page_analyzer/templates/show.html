@@ -2,27 +2,27 @@
 
 {% block content %}
 <div>
-    <h1>Website: {{ url.name }}</h1>
+    <h1>Сайт: {{ url.name }}</h1>
     <table class="table table-bordered">
         <tr>
             <td>ID</td>
             <td>{{ url.id }}</td>
         </tr>
         <tr>
-            <td>URL</td>
+            <td>Имя</td>
             <td>{{ url.name }}</td>
         </tr>
         <tr>
-            <td>Created at</td>
+            <td>Дата создания</td>
             <td>{{ url.created_at }}</td>
         </tr>
     </table>
 </div>
 
 <div class="mt-5">
-    <h2>Checks</h2>
+    <h2>Проверки</h2>
     <form action="{{ url_for('checks_post', id=url.id) }}" method="post" class="py-2">
-        <input type="submit" value="Initiate check" class="btn btn-primary">
+        <input type="submit" value="Запустить проверку" class="btn btn-primary">
     </form>
 </div>
 
@@ -30,11 +30,11 @@
     <table class="table table-bordered" data-test="checks">
         <tr>
             <th>ID</th>
-            <th>Response code</th>
+            <th>Код ответа</th>
             <th>h1</th>
             <th>Title</th>
             <th>Description</th>
-            <th>Created at</th>
+            <th>Дата создания</th>
         </tr>
         {% for check in checks %}
         <tr>
