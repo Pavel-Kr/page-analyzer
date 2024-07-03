@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Webpage SEO analyzer"
 authors = ["Pavel Krivosheev <pkrivosheev@bk.ru>"]
 readme = "README.md"
+packages = [
+    { include = "page_analyzer" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
