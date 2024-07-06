@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
 from datetime import date
+from psycopg2 import sql
 
 
 def get_urls_with_last_checks(db_url):
@@ -29,20 +30,23 @@ def get_urls_with_last_checks(db_url):
     return results
 
 
-def get_url_by_id(id, db_url):
+def get_url_by_key(key, value, db_url):
     with psycopg2.connect(db_url) as conn:
         with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-            curs.execute('SELECT * FROM urls WHERE id = %s', (id,))
+            query = sql.SQL('SELECT * FROM urls WHERE {} = %s').format(
+                sql.Identifier(key)
+            )
+            curs.execute(query, (value,))
             url = curs.fetchone()
             return url
+
+
+def get_url_by_id(id, db_url):
+    return get_url_by_key('id', id, db_url)
 
 
 def get_url_by_name(name, db_url):
-    with psycopg2.connect(db_url) as conn:
-        with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-            curs.execute('SELECT * FROM urls WHERE name = %s', (name,))
-            url = curs.fetchone()
-            return url
+    return get_url_by_key('name', name, db_url)
 
 
 def get_checks_by_url_id(url_id, db_url):
