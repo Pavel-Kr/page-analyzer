@@ -1,5 +1,12 @@
 from validators.url import url
 from urllib.parse import urlparse, urlunparse
+import requests
+from requests.exceptions import (
+    HTTPError,
+    Timeout,
+    ConnectionError
+)
+from bs4 import BeautifulSoup
 
 
 def is_url_valid(data):
@@ -27,3 +34,13 @@ def extract_seo_info(soup):
     if meta:
         description = meta[0]['content']
     return (h1, title, description)
+
+
+def make_request(url):
+    try:
+        r = requests.get(url.name, timeout=1)
+        r.raise_for_status()
+        content = BeautifulSoup(r.content, 'html.parser')
+        return r.status_code, content
+    except (ConnectionError, HTTPError, Timeout):
+        return None

@@ -19,11 +19,7 @@
             </div>
           </nav>
     </header>
-    {% for category, message in get_flashed_messages(with_categories=True) %}
-    <div class="alert alert-{{ category }}">
-        {{ message }}
-    </div>
-    {% endfor %}
+    {% include "flash.html" %}
     <main class="container mt-5">
         {% block content %}{% endblock %}
     </main>
