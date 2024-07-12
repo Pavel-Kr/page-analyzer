@@ -51,9 +51,8 @@ def urls_post():
     conn = db.connect(DATABASE_URL)
     url = db.get_url_by_name(new_url, conn)
     if not url:
-        db.insert_url(new_url, conn)
+        id = db.insert_url(new_url, conn)
         flash('Страница успешно добавлена', 'success')
-        id = db.get_url_by_name(new_url, conn).id
     else:
         flash('Страница уже существует', 'info')
         id = url.id

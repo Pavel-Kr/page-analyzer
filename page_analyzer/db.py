@@ -66,17 +66,20 @@ def get_checks_by_url_id(url_id, conn: connection):
 
 def insert_url(name, conn: connection):
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-        curs.execute('INSERT INTO urls (name, created_at) '
-                     'VALUES (%s, %s)', (name, date.today()))
+        curs.execute("""INSERT INTO urls (name, created_at)
+                     VALUES (%s, %s) RETURNING id""",
+                     (name, date.today()))
+        id = curs.fetchone().id
         conn.commit()
+        return id
 
 
 def insert_url_check(url_id, status_code, h1, title, desc, conn: connection):
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-        curs.execute('INSERT INTO url_checks'
-                     '(url_id, status_code, h1, title,'
-                     'description, created_at)'
-                     'VALUES (%s, %s, %s, %s, %s, %s)',
+        curs.execute("""INSERT INTO url_checks
+                     (url_id, status_code, h1, title,
+                     description, created_at)
+                     VALUES (%s, %s, %s, %s, %s, %s)""",
                      (url_id, status_code, h1, title,
                       desc, date.today()))
         conn.commit()
